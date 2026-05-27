@@ -37,8 +37,14 @@ export function chunkText(text: string, chunkSize = 1000, overlap = 200): string
       chunks.push(chunk);
     }
 
+    // If we've consumed to the end of the text, stop.
+    // Without this check, start = end - overlap stays < cleaned.length
+    // forever, causing an infinite loop and array overflow.
+    if (end >= cleaned.length) break;
+
     start = end - overlap;
-    if (start >= cleaned.length) break;
+    // Ensure forward progress in case overlap >= chunkSize
+    if (start <= 0 || start >= cleaned.length) break;
   }
 
   return chunks;
